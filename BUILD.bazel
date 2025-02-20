@@ -1,0 +1,41 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+
+N = 2000
+
+[
+    expand_template(
+        name = "i{}_sh".format(i),
+        out = "t{}.sh".format(i),
+        template = ":test.sh",
+        is_executable = True,
+        substitutions = {"REPLACE_ME": str(i)},
+    )
+    for i in range(
+        1,
+        N + 1,
+    )
+]
+
+[
+    sh_test(
+        name = "i{}".format(i),
+        srcs = ["t{}.sh".format(i)],
+    )
+    for i in range(
+        1,
+        N + 1,
+    )
+]
+
+platform(
+    name = "x86_64_linux_remote",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    exec_properties = {
+        "OSFamily": "Linux",
+        "container-image": "docker://ghcr.io/catthehacker/ubuntu:act-22.04@sha256:5f9c35c25db1d51a8ddaae5c0ba8d3c163c5e9a4a6cc97acd409ac7eae239448",
+    },
+    visibility = ["//visibility:public"],
+)

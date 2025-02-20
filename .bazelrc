@@ -1,0 +1,28 @@
+# don't try and auto detect the cc toolchain
+common --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+common --noincompatible_enable_cc_toolchain_resolution
+
+# common config
+common:ext-rbe-common --remote_accept_cached
+common:ext-rbe-common --remote_upload_local_results
+common:ext-rbe-common --host_platform=@//:x86_64_linux_remote
+common:ext-rbe-common --extra_execution_platforms=//:x86_64_linux_remote
+common:ext-rbe-common --jobs=800
+common:ext-rbe-common --remote_timeout=3600
+common:ext-rbe-common --genrule_strategy=remote
+
+# silo: grpcs://aw-remote-ext.aws.silo.aspect.build:8980
+common:ext-rbe-silo-alb --remote_cache="grpcs://aw-remote-ext.aws.silo.aspect.build:8980"
+common:ext-rbe-silo-alb --remote_executor="grpcs://aw-remote-ext.aws.silo.aspect.build:8980"
+common:ext-rbe-silo-alb --config=ext-rbe-common
+common:ext-rbe-silo-alb --credential_helper="aw-remote-ext.aws.silo.aspect.build"="credential-helper"
+
+# silo (nlb): grpcs://aw-ext-2.aws.silo.aspect.build:8980
+common:ext-rbe-silo-nlb --remote_cache="grpcs://aw-ext-2.aws.silo.aspect.build:8980"
+common:ext-rbe-silo-nlb --remote_executor="grpcs://aw-ext-2.aws.silo.aspect.build:8980"
+common:ext-rbe-silo-nlb --config=ext-rbe-common
+
+# other cluster: grpcs://other.cluster.com:8980
+common:ext-rbe-other --remote_cache="grpcs://other.cluster.com:8980"
+common:ext-rbe-other --remote_executor="grpcs://other.cluster.com:8980"
+common:ext-rbe-other --config=ext-rbe-common
